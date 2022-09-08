@@ -9,7 +9,11 @@ const ExpressError = require('./utils/ExpressError');
 const { stat } = require('fs');
 const campgroundsRoutes = require("./routes/campgroundRoutes");
 const reviewRoutes = require("./routes/reviewsRoutes");
+const usersRoutes = require("./routes/usersRoutes");
 const app = express();
+const passport = require("passport");
+const localPassport = require("passport-local");
+const User = require('./models/user');
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
@@ -43,14 +47,29 @@ const sessionConfig = {
 }
 app.use(session(sessionConfig));
 app.use(flash());
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new localPassport(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     next();
 })
 
+app.get('/fakeUser', async (req, res) => {
+    const user = new User({ email: 'mmalpa97@wp.pl', username: 'MMalpa' })
+    const newUser = await User.register(user, 'chicken');
+    res.send(newUser);
+})
+
 app.use('/campgrounds', campgroundsRoutes);
 app.use('/campgrounds/:id/reviews', reviewRoutes);
+app.use('/', usersRoutes);
 
 app.get('/', (req, res) => {
     res.send('home');
