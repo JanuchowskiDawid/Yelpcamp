@@ -17,8 +17,13 @@ router.post('/register', catchAsync(async (req, res) => {
         const { username, password, email } = req.body.User;
         const newUser = new User({ email, username });
         const registeredUser = await User.register(newUser, password);
-        req.flash('success', 'welcome to yelpcamp');
-        res.redirect('/campgrounds');
+        req.login(registeredUser, err => {
+            if (err) {
+                return next(err);
+            }
+            req.flash('success', 'welcome to yelpcamp');
+            res.redirect('/campgrounds');
+        })
     } catch (e) {
         req.flash('error', e.message);
         res.redirect('register');
@@ -27,7 +32,17 @@ router.post('/register', catchAsync(async (req, res) => {
 
 router.post('/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), (req, res) => {
     req.flash('success', 'hallo again');
-    res.redirect('/campgrounds');
+    const nextStep = req.session.returnTo || '/campgrounds';
+    delete req.session.returnTo;
+    res.redirect(nextStep);
 })
+
+router.get('/logout', (req, res, next) => {
+    req.logout(function (err) {
+        if (err) { return next(err); }
+        req.flash('success', "Goodbye!");
+        res.redirect('/campgrounds');
+    });
+});
 
 module.exports = router;
