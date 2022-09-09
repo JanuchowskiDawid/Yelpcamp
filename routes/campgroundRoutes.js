@@ -2,10 +2,13 @@ const express = require('express');
 const router = express.Router();
 const campgrounds = require('../controllers/campgrounds');
 const { isLoggedIn, validateCampground, checkOwner } = require('../utils/middleware');
+const multer = require('multer');
+const { storage } = require('../cloudinary');
+const upload = multer({ storage });
 
 router.route('/')
     .get(campgrounds.showAll)
-    .post(isLoggedIn, campgrounds.createNewPage);
+    .post(isLoggedIn, upload.array('image'), campgrounds.createNewPage);
 
 router.get('/new', isLoggedIn, campgrounds.renderNewPage);
 

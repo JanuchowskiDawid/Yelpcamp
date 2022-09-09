@@ -26,6 +26,7 @@ module.exports.renderShowPage = catchAsync(async (req, res) => {
 
 module.exports.createNewPage = catchAsync(async (req, res, next) => {
     const newCampground = new Campground(req.body.campground);
+    newCampground.images = req.files.map(f => ({ path: f.path, filemane: f.filename }));
     newCampground.author = req.user._id;
     await newCampground.save();
     req.flash('success', 'Congrats! New campground created')
