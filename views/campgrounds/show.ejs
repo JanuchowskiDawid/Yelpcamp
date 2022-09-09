@@ -38,40 +38,46 @@
             </div>
         </div>
         <div class="col-6">
-            <h2>Leave a review</h2>
-            <form class="mb-3 validated-form" action="/campgrounds/<%=campground._id%>/reviews" method="post"
-                novalidate>
-                <div class="mb3">
-                    <label class="form-label" for="rating">Rating</label>
-                    <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="body">Review</label>
-                    <textarea class="form-control" name="review[body]" id="body" cols="30" rows="10"
-                        required></textarea>
-                    <div class="valid-feedback">Looks good</div>
-                    <div class="invalid-feedback">Fill this area</div>
-                </div>
-                <button class="btn btn-success">Submit</button>
-            </form>
-            <% for(let review of campground.reviews) {%>
-                <div class="card">
-                    <div class="card-body mb-3">
-                        <h5 class="card-title">Rating: <%= review.rating %>
-                        </h5>
-                        <p class="card-text">
-                            Review: <%= review.body %>
-                        </p>
-                        <form action="/campgrounds/<%=campground._id%>/reviews/<%=review._id%>?_method=DELETE"
-                            method="post">
-                            <button class="btn btn-danger">
-                                Delete
-                            </button>
-                        </form>
+            <% if(currentUser) {%>
+                <h2>Leave a review</h2>
+                <form class="mb-3 validated-form" action="/campgrounds/<%=campground._id%>/reviews" method="post"
+                    novalidate>
+                    <div class="mb3">
+                        <label class="form-label" for="rating">Rating</label>
+                        <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating">
                     </div>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="body">Review</label>
+                        <textarea class="form-control" name="review[body]" id="body" cols="30" rows="10"
+                            required></textarea>
+                        <div class="valid-feedback">Looks good</div>
+                        <div class="invalid-feedback">Fill this area</div>
+                    </div>
+                    <button class="btn btn-success">Submit</button>
+                </form>
                 <% } %>
-                    <footer>
-                    </footer>
+                    <h2>Reviews:</h2>
+                    <% for(let review of campground.reviews) {%>
+                        <div class="card">
+                            <div class="card-body mb-3">
+                                <h5 class="card-title">Rating: <%= review.rating %> - <%= review.author.username %>
+                                </h5>
+                                <p class="card-text">
+                                    Review: <%= review.body %>
+                                </p>
+                                <% if(currentUser && review.author.equals(currentUser)){ %>
+                                    <form
+                                        action="/campgrounds/<%=campground._id%>/reviews/<%=review._id%>?_method=DELETE"
+                                        method="post">
+                                        <button class="btn btn-danger">
+                                            Delete
+                                        </button>
+                                    </form>
+                                    <% } %>
+                            </div>
+                        </div>
+                        <% } %>
+                            <footer>
+                            </footer>
         </div>
     </div>
