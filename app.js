@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
+const dbURL=process.env.DBURL;
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -19,8 +20,12 @@ const passport = require("passport");
 const localPassport = require("passport-local");
 const User = require('./models/user');
 const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
+const MongoStore = require('connect-mongo')(session);
+const secret = process.env.SECRET || 'thisisnotthebestsecret';
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {
+
+mongoose.connect(dbURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
@@ -32,6 +37,9 @@ mongoose.connect('mongodb://localhost:27017/yelp-camp', {
         console.log(err);
     })
 
+
+
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -41,8 +49,32 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize());
 
+
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.originAgentCluster());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
+
+const store = new MongoStore({
+    url : dbURL,
+    secret,
+    touchAfter: 24*3600
+});
+
+store.on('error', function(e){
+    console.log("Session STORE ERROR",e);
+});
+
 const sessionConfig = {
-    secret: 'campgrounds',
+    store,
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -53,6 +85,10 @@ const sessionConfig = {
 }
 app.use(session(sessionConfig));
 app.use(flash());
+// app.use(session({
+//     secret: 'foo',
+//     store: MongoStore.create(options)
+// }));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -85,6 +121,8 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('error', { err });
 })
 
-app.listen(3000, () => {
-    console.log('Serving on port 3000');
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+    console.log(`Serving on port ${port}`);
 })
