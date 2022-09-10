@@ -115,6 +115,7 @@ map.on('load', () => {
             )
             .addTo(map);
     });
+    map.addControl(new mapboxgl.NavigationControl());
 
     map.on('mouseenter', 'clusters', () => {
         map.getCanvas().style.cursor = 'pointer';
