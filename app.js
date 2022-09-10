@@ -18,6 +18,7 @@ const app = express();
 const passport = require("passport");
 const localPassport = require("passport-local");
 const User = require('./models/user');
+const mongoSanitize = require('express-mongo-sanitize');
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
@@ -38,6 +39,7 @@ app.engine('ejs', ejsMate);
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(mongoSanitize());
 
 const sessionConfig = {
     secret: 'campgrounds',

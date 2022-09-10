@@ -1,4 +1,4 @@
-const campgroundSchema = require('../schemas/campgroundSchema');
+const { campgroundSchema, reviewSchema } = require('../schemas/schemas');
 const ExpressError = require('../utils/ExpressError');
 const Campground = require('../models/campground');
 const Review = require('../models/review');
@@ -13,6 +13,7 @@ module.exports.isLoggedIn = (req, res, next) => {
 }
 module.exports.validateCampground = (req, res, next) => {
     const { error } = campgroundSchema.validate(req.body);
+    console.log(req.body);
     if (error) {
         const msg = error.details.map(el => el.message).join(',')
         throw new ExpressError(msg, 400)
@@ -42,7 +43,7 @@ module.exports.checkReviewOwner = async (req, res, next) => {
 
 }
 
-module.exports.validateReview = ((req, res, next) => {
+module.exports.validateReview = (req, res, next) => {
     const { error } = reviewSchema.validate(req.body);
     if (error) {
         const msg = error.details.map(el => el.message).join(',')
@@ -50,4 +51,4 @@ module.exports.validateReview = ((req, res, next) => {
     } else {
         next();
     }
-})
+}

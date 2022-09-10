@@ -8,13 +8,13 @@ const upload = multer({ storage });
 
 router.route('/')
     .get(campgrounds.showAll)
-    .post(isLoggedIn, upload.array('image'), campgrounds.createNewCampground);
+    .post(isLoggedIn, upload.array('image'), validateCampground, campgrounds.createNewCampground)
 
 router.get('/new', isLoggedIn, campgrounds.renderNewPage);
 
 router.route('/:id')
     .get(campgrounds.renderShowPage)
-    .put(isLoggedIn, checkOwner, upload.array('image'), campgrounds.updateCampground)
+    .put(isLoggedIn, checkOwner, upload.array('image'), validateCampground, campgrounds.updateCampground)
     .delete(isLoggedIn, checkOwner, campgrounds.deleteCampground);
 
 router.get('/:id/edit', isLoggedIn, checkOwner, campgrounds.editCampground);
