@@ -32,6 +32,9 @@ const seedDB = async () => {
                 path: "https://res.cloudinary.com/dkz5owf75/image/upload/v1662743570/YelpCamp/nulq6mawv7ib4wbo333f.jpg",
                 filename: 'image2'
             }],
+            geometry:{
+                type: 'Point',
+                coordinates: [-74.5,50]},
             description: 'csawadasfaffsaafasfsaffas',
             price: randomPrice,
             author: "631a1abe4e002c069d4bef96"
