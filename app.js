@@ -71,7 +71,7 @@ app.use('/campgrounds/:id/reviews', reviewRoutes);
 app.use('/', usersRoutes);
 
 app.get('/', (req, res) => {
-    res.send('home');
+    res.render('home');
 })
 
 app.all('*', (req, res, next) => {
